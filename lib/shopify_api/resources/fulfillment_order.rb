@@ -1,0 +1,14 @@
+module ShopifyAPI
+  class FulfillmentOrder < Base
+    def self.all(options = {})
+      order_id = options.dig(:params, :order_id)
+      order = ::ShopifyAPI::Order.new(id: order_id)
+      order.fulfillment_orders
+    end
+
+    def fulfillments(options = {})
+      fo_fulfillments = get(:fulfillments, options)
+      fo_fulfillments.map { |fof| FulfillmentOrderFulfillment.new(fof.as_json) }
+    end
+  end
+end

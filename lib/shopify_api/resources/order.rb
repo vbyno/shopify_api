@@ -30,6 +30,11 @@ module ShopifyAPI
       Transaction.create(capture_transaction)
     end
 
+    def fulfillment_orders(options = {})
+      order_fulfillment_orders = get(:fulfillment_orders, options)
+      order_fulfillment_orders.map { |ofo| FulfillmentOrder.new(ofo.as_json) }
+    end
+
     class ClientDetails < Base
     end
   end
