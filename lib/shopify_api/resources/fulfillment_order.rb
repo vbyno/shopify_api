@@ -14,12 +14,16 @@ module ShopifyAPI
     end
 
     def move(new_location_id:)
-      body = { fulfillment_order: { new_location_id: new_location_id } }
-      load_values(post(:move, body, only_id))
+      body = { fulfillment_order: { new_location_id: new_location_id } }.to_json
+      keyed_fulfillment_orders = keyed_fulfillment_orders_from_response(post(:move, {}, body))
+      load_keyed_fulfillment_order(keyed_fulfillment_orders, 'original_fulfillment_order')
+      keyed_fulfillment_orders
     end
 
     def cancel
-      load_values(post(:cancel, {}, only_id))
+      keyed_fulfillment_orders = keyed_fulfillment_orders_from_response(post(:cancel, {}, only_id))
+      load_keyed_fulfillment_order(keyed_fulfillment_orders, 'fulfillment_order')
+      keyed_fulfillment_orders
     end
 
     def close
@@ -28,17 +32,19 @@ module ShopifyAPI
 
     private
 
-    def load_values(response)
+    def load_keyed_fulfillment_order(keyed_fulfillment_orders, key)
+      if keyed_fulfillment_orders[key]&.attributes
+        load(keyed_fulfillment_orders[key].attributes, false, true)
+      end
+    end
+
+    def keyed_fulfillment_orders_from_response(response)
       return load_attributes_from_response(response) if response.code != '200'
 
-      keyed_fulfillments = ActiveSupport::JSON.decode(response.body)
-      keyed_fulfillments.map do |key, fo_attributes|
-        if fo_attributes.nil?
-          [key, nil]
-        else
-          [key, FulfillmentOrder.new(fo_attributes)]
-        end
-      end.to_h
+      keyed_fulfillment_orders = ActiveSupport::JSON.decode(response.body)
+      keyed_fulfillment_orders.transform_values do |fulfillment_order_attributes|
+        FulfillmentOrder.new(fulfillment_order_attributes) if fulfillment_order_attributes
+      end
     end
   end
 end

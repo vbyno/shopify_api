@@ -14,7 +14,7 @@ class AssignedFulFillmentOrderTest < Test::Unit::TestCase
 
         assert_equal 2, assigned_fulfillment_orders.count
         assigned_fulfillment_orders.each do |fulfillment_order|
-          assert_equal 'ShopifyAPI::FulfillmentOrder', fulfillment_order.class.name
+          assert fulfillment_order.is_a?(ShopifyAPI::FulfillmentOrder)
           assert_equal 'in_progress', fulfillment_order.status
           assert_equal 'cancellation_accepted', fulfillment_order.request_status
         end
@@ -32,7 +32,7 @@ class AssignedFulFillmentOrderTest < Test::Unit::TestCase
 
         assert_equal 2, assigned_fulfillment_orders.count
         assigned_fulfillment_orders.each do |fulfillment_order|
-          assert_equal 'ShopifyAPI::FulfillmentOrder', fulfillment_order.class.name
+          assert fulfillment_order.is_a?(ShopifyAPI::FulfillmentOrder)
           assert_equal assigned_location_id, fulfillment_order.assigned_location_id
         end
       end

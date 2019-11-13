@@ -82,7 +82,7 @@ class OrderTest < Test::Unit::TestCase
 
     assert_equal [519788021, 519788022], fulfillment_orders.map(&:id).sort
     fulfillment_orders.each do |fulfillment_order|
-      assert_equal 'ShopifyAPI::FulfillmentOrder', fulfillment_order.class.name
+      assert fulfillment_order.is_a?(ShopifyAPI::FulfillmentOrder)
       assert_equal 450789469, fulfillment_order.order_id
     end
   end
