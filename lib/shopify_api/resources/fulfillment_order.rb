@@ -30,29 +30,29 @@ module ShopifyAPI
       load_attributes_from_response(post(:close, {}, only_id))
     end
 
-    def fulfillment_request(fulfillment_order_line_items:, message:)
+    def request_fulfillment(fulfillment_order_line_items:, message: nil)
       body = {
         fulfillment_request: {
           fulfillment_order_line_items: fulfillment_order_line_items,
           message: message
         }
       }
-      keyed_fos = load_keyed_fulfillment_orders_from_response(post(:fulfillment_request, {}, body.to_json))
-      if keyed_fos&.fetch('original_fulfillment_order', nil)&.attributes
-        load(keyed_fos['original_fulfillment_order'].attributes, false, true)
-      end
-      keyed_fos
+      keyed_fulfillment_orders = keyed_fulfillment_orders_from_response(post(:fulfillment_request, {}, body.to_json))
+      load_keyed_fulfillment_order(keyed_fulfillment_orders, 'original_fulfillment_order')
+      keyed_fulfillment_orders
     end
 
-    def accept_fulfillment_request(params)
-      load_attributes_from_response(post('fulfillment_request/accept', {}, params.to_json))
+    def accept_fulfillment_request(message: nil)
+      body = { message: message }
+      load_attributes_from_response(post('fulfillment_request/accept', {}, body.to_json))
     end
 
-    def reject_fulfillment_request(params)
-      load_attributes_from_response(post('fulfillment_request/reject', {}, params.to_json))
+    def reject_fulfillment_request(message: nil)
+      body = { message: message }
+      load_attributes_from_response(post('fulfillment_request/reject', {}, body.to_json))
     end
 
-    def cancellation_request(message:)
+    def request_cancellation(message: nil)
       body = {
         cancellation_request: {
           message: message
@@ -61,12 +61,14 @@ module ShopifyAPI
       load_attributes_from_response(post(:cancellation_request, {}, body.to_json))
     end
 
-    def accept_cancellation_request(params)
-      load_attributes_from_response(post('cancellation_request/accept', {}, params.to_json))
+    def accept_cancellation_request(message: nil)
+      body = { message: message }
+      load_attributes_from_response(post('cancellation_request/accept', {}, body.to_json))
     end
 
-    def reject_cancellation_request(params)
-      load_attributes_from_response(post('cancellation_request/reject', {}, params.to_json))
+    def reject_cancellation_request(message: nil)
+      body = { message: message }
+      load_attributes_from_response(post('cancellation_request/reject', {}, body.to_json))
     end
 
     private
